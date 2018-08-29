@@ -6,7 +6,7 @@ import time
 
 class LmVocabulary(object):
 
-    def __init__(self, rawDataGenerator, wordCutNum, restore_path = None):
+    def __init__(self, rawDataGenerator, wordCutNum, restore_path=None):
         self.wordCutNum = wordCutNum
         self._pad = 0
         self._unk = 1
@@ -14,12 +14,12 @@ class LmVocabulary(object):
         self._eos = 3
         self.corpus_size = 0
 
-        if restore_path != None:
+        if restore_path is not None:
             pass
         else:
-            self._word_to_id, self._id_to_word = self.vocabGen(rawDataGenerator)
+            self._word_to_id, self._id_to_word = self.vocab_gen(rawDataGenerator)
 
-    def vocabGen(self, rawDataGenerator):
+    def vocab_gen(self, rawDataGenerator):
         vocab = Counter()
         for no, words in enumerate(rawDataGenerator):
             for word in words:
@@ -27,7 +27,6 @@ class LmVocabulary(object):
             self.corpus_size += 1
             if no % 1000000 == 0:
                 print("process %d sentence, get %d vocab" % (no, len(vocab)))
-
         print("process %d sentence, get %d vocab" % (no, len(vocab)))
 
         vocab_cut = {k: v for k, v in vocab.items() if v >= self.wordCutNum}
@@ -43,7 +42,6 @@ class LmVocabulary(object):
         idx2word = dict(zip(idx, word))
 
         print("process %d sentence, get %d vocab_post" % (no, len(vocab_post)))
-
         return vocab_post, idx2word
 
     def save_vocab(self, FLAGS):
@@ -64,3 +62,30 @@ class LmVocabulary(object):
         with open(vocab_save_path, 'w', encoding='utf-8') as fwrite:
             for k, v in self._word_to_id.items():
                 fwrite.write(k + "\t" + str(v) + "\n")
+
+    def word_to_id(self, word):
+        try:
+            return self._word_to_id[word]
+        except KeyError:
+            return self._word_to_id[u'<UNK>']
+
+    def id_to_word(self, idx):
+        return self._id_to_word[idx]
+
+    def encode(self, sentence):
+        idx_data = [self._word_to_id[u'<SOS>']]
+        for word in sentence:
+            idx_data.append(self.word_to_id(word))
+        idx_data.append(self._word_to_id[u'<EOS>'])
+        return idx_data
+
+    def decode(self, idx_data):
+        return ' '.join([self.id_to_word(idx) for idx in idx_data])
+
+    def idx_data_gen(self, rawDataGenerator):
+        idx_data = []
+        for no, raw_data in enumerate(rawDataGenerator):
+            idx_data.append(self.encode(raw_data))
+            print("process %d sentence" % no)
+
+        return idx_data
