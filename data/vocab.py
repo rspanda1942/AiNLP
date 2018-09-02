@@ -14,6 +14,7 @@ class LmVocabulary(object):
         self._bos = 2
         self._eos = 3
         self.corpus_size = 0
+        self.vocab_size = 0
 
         if restore_path is not None:
             pass
@@ -42,7 +43,8 @@ class LmVocabulary(object):
         word, idx = zip(*vocab_post.items())
         idx2word = dict(zip(idx, word))
 
-        print("process %d sentence, get %d vocab_post" % (no, len(vocab_post)))
+        self.vocab_size = len(vocab_post)
+        print("process %d sentence, get %d vocab_post" % (no, self.vocab_size))
         return vocab_post, idx2word
 
     def save_vocab(self, FLAGS):
