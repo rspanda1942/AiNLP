@@ -3,12 +3,11 @@ import numpy as np
 import tensorflow as tf
 
 
-class LmDataGenerator(object):
+class DataGenerator(object):
 
-    def __init__(self, idx_text_data):
+    def __init__(self, data_size):
 
-        self.idx_text_data = idx_text_data
-        self.data_size = len(idx_text_data)
+        self.data_size = data_size
 
     def __len__(self):
         return self.data_size
@@ -51,7 +50,7 @@ class TFLmDataSet(object):
     def __init__(self, idx_text_data, FLAGS):
 
         self.lmDataProcess = LmDataProcess(idx_text_data, FLAGS.max_sentence_length)
-        self.lmDataGenerator = LmDataGenerator(idx_text_data)
+        self.lmDataGenerator = DataGenerator(len(idx_text_data))
         self.data_length = self.lmDataProcess.data_length
         self.batch_size = FLAGS.batch_size
         self.iterator = self.setDataSetIterator(FLAGS)
@@ -73,8 +72,8 @@ class TFLmDataSet(object):
                                                                     tf.float32]),
                               num_parallel_calls=FLAGS.CPU_COUNT)
 
-        #dataset = dataset.batch(FLAGS.batch_size)
-        dataset = dataset.apply(tf.contrib.data.batch_and_drop_remainder(FLAGS.batch_size))
+        dataset = dataset.batch(FLAGS.batch_size, drop_remainder=FLAGS.drop_remainder)
+        #dataset = dataset.apply(tf.contrib.data.batch_and_drop_remainder(FLAGS.batch_size))
         dataset = dataset.prefetch(FLAGS.data_prefetch_num)
         iterator = dataset.make_initializable_iterator()
 

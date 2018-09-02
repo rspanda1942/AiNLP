@@ -4,6 +4,7 @@ import os
 from io import open
 import time
 
+
 class LmVocabulary(object):
 
     def __init__(self, rawDataGenerator, wordCutNum, restore_path=None):
