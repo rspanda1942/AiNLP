@@ -70,11 +70,13 @@ class PositionalEmbedding(object):
     def __init__(self,
                  num_units,
                  max_position = 256,
+                 trainable = True,
                  scale = False,
                  name = "positionalEmbedding"):
 
         self.num_units = num_units
         self.max_position = max_position
+        self.trainable = trainable
         self.scale = scale
         self.name = name
 
@@ -96,7 +98,7 @@ class PositionalEmbedding(object):
             lookup_table = tf.get_variable('position_lookup_table',
                                             initializer=position_enc,
                                             dtype=tf.float32,
-                                            trainable=True)
+                                            trainable=self.trainable)
 
             position_outputs = tf.nn.embedding_lookup(lookup_table, position_ind)
             if inputs_mask is not None:
