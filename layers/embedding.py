@@ -82,8 +82,8 @@ class PositionalEmbedding(object):
 
     def __call__(self, inputs, inputs_mask=None):
 
-        B, W = tf.shape(inputs)
         with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE):
+            B, W = tf.shape(inputs)
             position_ind = tf.tile(tf.expand_dims(tf.range(W), 0), [B, 1])
 
             # First part of the PE function: sin and cos argument

@@ -39,10 +39,13 @@ class LmDataProcess(object):
         label = np.zeros((self.data_length), dtype=np.int32)
         label[0:raw_length-1] = raw_data[1:]
 
-        label_mask = np.zeros((self.data_length), dtype=np.float32)
-        label_mask[0:raw_length] = 1
+        input_mask = np.zeros((self.data_length), dtype=np.float32)
+        input_mask[0:raw_length] = 1.0
 
-        return (input_text_idx, label, label_mask)
+        label_mask = np.zeros((self.data_length), dtype=np.float32)
+        label_mask[0:raw_length-1] = 1.0
+
+        return (input_text_idx, input_mask, label, label_mask)
 
 
 class TFLmDataSet(object):
@@ -68,6 +71,7 @@ class TFLmDataSet(object):
         dataset = dataset.map(lambda raw_data_idx: tf.py_func(func=self.lmDataProcess,
                                                               inp=[raw_data_idx],
                                                               Tout=[tf.int32,
+                                                                    tf.float32,
                                                                     tf.int32,
                                                                     tf.float32]),
                               num_parallel_calls=FLAGS.CPU_COUNT)
@@ -82,32 +86,36 @@ class TFLmDataSet(object):
     def getBatch(self):
 
         value = self.iterator.get_next()
-        input_text_idx, label, label_mask = value
+        input_text_idx, input_mask, label, label_mask = value
 
         input_text_idx.set_shape([self.batch_size, self.data_length])
+        input_mask.set_shape([self.batch_size, self.data_length])
         label.set_shape([self.batch_size, self.data_length])
         label_mask.set_shape([self.batch_size, self.data_length])
 
-        return input_text_idx, label, label_mask
+        return input_text_idx, input_mask, label, label_mask
 
     def getBatch_multiGPU(self, num_GPU):
 
         value = self.iterator.get_next()
-        input_text_idx, label, label_mask = value
+        input_text_idx, input_mask, label, label_mask = value
 
         input_text_idx.set_shape([self.batch_size, self.data_length])
+        input_mask.set_shape([self.batch_size, self.data_length])
         label.set_shape([self.batch_size, self.data_length])
         label_mask.set_shape([self.batch_size, self.data_length])
 
         input_text_idx_split = tf.split(input_text_idx, num_GPU)
-        label = tf.split(label, num_GPU)
-        label_mask = tf.split(label_mask, num_GPU)
+        input_mask_split = tf.split(input_mask, num_GPU)
+        label_split = tf.split(label, num_GPU)
+        label_mask_split = tf.split(label_mask, num_GPU)
 
         data_batch_multi = []
         for i in range(num_GPU):
             data_batch_multi.append([input_text_idx_split[i],
-                                     label[i],
-                                     label_mask[i]])
+                                     input_mask_split[i],
+                                     label_split[i],
+                                     label_mask_split[i]])
 
         return data_batch_multi
 
