@@ -89,6 +89,7 @@ class LmVocabulary(object):
         idx_data = []
         for no, raw_data in enumerate(rawDataGenerator):
             idx_data.append(self.encode(raw_data))
-            print("process %d sentence" % no)
+            if no % 1000000 == 0:
+                print("process %d sentence" % no)
 
         return idx_data

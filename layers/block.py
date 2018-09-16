@@ -10,8 +10,8 @@ class CnnGLUBlock(object):
                  dropout_rate = 0.1,
                  is_batch_norm = True,
                  is_training = True,
-                 pad_format="normal",
-                 reuse=tf.AUTO_REUSE,
+                 pad_format = "normal",
+                 reuse = None,
                  name = "CnnGLUBlock"):
 
         self.block_size = block_size

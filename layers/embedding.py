@@ -69,7 +69,7 @@ class PositionalEmbedding(object):
     # https://github.com/Kyubyong/transformer
     def __init__(self,
                  num_units,
-                 max_position = 256,
+                 max_position = 512,
                  trainable = True,
                  scale = False,
                  name = "positionalEmbedding"):
@@ -83,8 +83,8 @@ class PositionalEmbedding(object):
     def __call__(self, inputs, inputs_mask=None):
 
         with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE):
-            B, W = tf.shape(inputs)
-            position_ind = tf.tile(tf.expand_dims(tf.range(W), 0), [B, 1])
+            batch_size, sentence_length = tf.shape(inputs)
+            position_ind = tf.tile(tf.expand_dims(tf.range(sentence_length), 0), [batch_size, 1])
 
             # First part of the PE function: sin and cos argument
             position_enc = np.array([

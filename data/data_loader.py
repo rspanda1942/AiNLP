@@ -36,11 +36,11 @@ class LmDataProcess(object):
         input_text_idx = np.zeros((self.data_length), dtype=np.int32)
         input_text_idx[0:raw_length] = raw_data
 
-        label = np.zeros((self.data_length), dtype=np.int32)
-        label[0:raw_length-1] = raw_data[1:]
-
         input_mask = np.zeros((self.data_length), dtype=np.float32)
         input_mask[0:raw_length] = 1.0
+
+        label = np.zeros((self.data_length), dtype=np.int32)
+        label[0:raw_length-1] = raw_data[1:]
 
         label_mask = np.zeros((self.data_length), dtype=np.float32)
         label_mask[0:raw_length-1] = 1.0

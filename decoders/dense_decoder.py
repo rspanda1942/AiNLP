@@ -17,9 +17,20 @@ class SampledSoftmaxDecoder(object):
         self.init = init
 
     def dense_decode(self,
-               inputs,
-               sequence_length,
-               labels):
+                     inputs,
+                     labels_sequence_length,
+                     labels):
+
+        """
+
+        Args:
+            inputs: B * W * D
+            sequence_length: B
+            labels: B * W
+
+        Returns:
+
+        """
 
         # share the embedding with encoder
         with tf.variable_scope('wordEmbedding', reuse=tf.AUTO_REUSE):
@@ -49,7 +60,7 @@ class SampledSoftmaxDecoder(object):
         loss = tf.reshape(loss, [batch_size, sentence_length])
 
         inputs_mask = tf.sequence_mask(
-            sequence_length, maxlen=sentence_length, dtype=tf.float32)
+            labels_sequence_length, maxlen=sentence_length, dtype=tf.float32)
 
         loss = tf.multiply(loss, inputs_mask)
 

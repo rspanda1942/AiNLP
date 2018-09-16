@@ -12,7 +12,7 @@ class Conv2d(object):
                  dilations=[1, 1, 1, 1],
                  data_format="NHWC",
                  kernel_init=tf.contrib.layers.xavier_initializer_conv2d(uniform=False),
-                 reuse =tf.AUTO_REUSE,
+                 reuse = None,
                  is_weight_norm = False,
                  name="Conv2d"):
 
@@ -49,6 +49,10 @@ class Conv2d(object):
 
             kernel_para = tf.Variable(self.kernel_init(conv_kernel_size), name="kernel_para")
             bias_para = tf.Variable(tf.zeros([self.filter_size]), name="bias_para")
+
+            if self.is_weight_norm:
+                # do weight norm
+                pass
 
             inputs = tf.nn.conv2d(inputs,
                                   kernel_para,
@@ -106,7 +110,7 @@ class CnnGLU(object):
                  pad_format="normal",
                  data_format="NHWC",
                  kernel_init=tf.contrib.layers.xavier_initializer_conv2d(uniform=False),
-                 reuse =tf.AUTO_REUSE,
+                 reuse = None,
                  dropout_rate = 0.1,
                  is_weight_norm = False,
                  is_batch_norm = True,
