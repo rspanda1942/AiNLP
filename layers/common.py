@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import sys
+sys.path.append("..")
+import constants
 import tensorflow as tf
 import numpy as np
 
@@ -69,7 +72,7 @@ class Padding(object):
 
     def __init__(self,
                  kernel_size,
-                 pad_format="normal",
+                 pad_format=constants.PAD_FORMAT_NORMAL,
                  data_format="NHWC"):
         """
 
@@ -88,11 +91,11 @@ class Padding(object):
         if self.data_format != "NHWC":
             raise RuntimeError
 
-        if self.pad_format == "left":
+        if self.pad_format == constants.PAD_FORMAT_PREFIX:
             height_left_pad = self.kernel_size[0] - 1
             width_left_pad = self.kernel_size[1] - 1
             inputs = tf.pad(inputs, [[0, 0], [height_left_pad, 0], [width_left_pad, 0], [0, 0]])
-        elif self.pad_format == "normal":
+        elif self.pad_format == constants.PAD_FORMAT_NORMAL:
             height_pad = int((self.kernel_size[0] - 1)/2)
             width_pad = int((self.kernel_size[1] - 1)/2)
             inputs = tf.pad(inputs, [[0, 0], [height_pad, height_pad], [width_pad, width_pad], [0, 0]])
@@ -107,7 +110,7 @@ class CnnGLU(object):
                  kernel_size,
                  strides=[1, 1, 1, 1],
                  dilations=[1, 1, 1, 1],
-                 pad_format="normal",
+                 pad_format=constants.PAD_FORMAT_NORMAL,
                  data_format="NHWC",
                  kernel_init=tf.contrib.layers.xavier_initializer_conv2d(uniform=False),
                  reuse = None,
